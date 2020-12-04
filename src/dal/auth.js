@@ -1,16 +1,16 @@
-const pool = require('../db')
+const {pool} = require('../config/index')
+
+const {getAuthByEmailQuery, addAuthQuery} = require("../query_builder/queries")
 
 class authDal {
 
     async addAuth({email, password, role, employeeId, clientId}) {
-        const auth = await pool.query('INSERT INTO auths (email, password, role, employeeId, clientId) VALUES (?,?,?,?,?)',
-            [email, password, role, employeeId, clientId])
+        const auth = await pool.query(addAuthQuery, [email, password, role, employeeId, clientId])
         return auth[0].insertId
     }
 
-    async getAuth(email) {
-        const auth = await pool.query('SELECT * FROM auths WHERE email = (?)',
-            [email])
+    async getAuthByEmail(email) {
+        const auth = await pool.query(getAuthByEmailQuery, [email])
         return auth[0][0]
     }
 }

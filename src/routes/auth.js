@@ -1,6 +1,6 @@
 require("express-async-errors")
 const express = require('express')
-const authLogic = new (require("../bl/auth"))()
+const authLogic = new (require("../controller/auth"))()
 
 const router = express.Router()
 
