@@ -1,0 +1,4 @@
+name: auth
+port: 30000
+deployment:
+  replicas: 5
