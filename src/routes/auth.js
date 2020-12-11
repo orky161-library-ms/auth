@@ -17,8 +17,8 @@ router.post("/login",(async (req, res) => {
     res.status(200).json({token})
 }))
 router.get("/verify",(async (req, res) => {
-    const decoded = await authLogic.verifyToken(req.headers['x-access-token'])
-    res.status(200).json({decoded})
+        const decoded = await authLogic.verifyToken(req.headers['x-access-token'])
+        res.status(200).json({decoded})
 }))
 
 module.exports = router

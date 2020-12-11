@@ -19,8 +19,7 @@ class authLogic{
         try {
             const auth = await authDal.getAuthByEmail(email)
             if (auth.password === this.hashPassword(password)) {
-                const res = await this.generateToken(auth)
-                return res
+                return this.generateToken(auth)
             }
             throw Error()
         }
@@ -30,11 +29,10 @@ class authLogic{
     }
     verifyToken(t) {
         return  new Promise((resolve, reject) => {
-            if (!t)
-                return reject()
-
+            if (!/^Barrer /.test(t))
+                return reject("Should Barrer the token")
             const token = t.replace('Barrer ', '');
-            jwt.verify(token, "process.env.TOKEN_PRIVATE_KEY", (err, decoded) => {
+            jwt.verify(token, process.env.TOKEN_PRIVATE_KEY, (err, decoded) => {
                 if (err) {
                     reject(Error);
                 }
@@ -44,12 +42,10 @@ class authLogic{
         })
     }
 
-    generateToken (user) {
+    generateToken ({id, email, role}) {
         return new Promise((resolve) => {
-            jwt.sign({ id: user.id, email: user.email, role: user.role }, "process.env.TOKEN_PRIVATE_KEY", { algorithm: 'HS256' }, function (
-                err,
-                token
-            ) {
+            jwt.sign({ id, email, role }, process.env.TOKEN_PRIVATE_KEY, { algorithm: 'HS256' },
+                 (err, token) => {
                 resolve(token);
             });
         });

@@ -2,7 +2,6 @@ require('dotenv').config("./env");
 
 const {pool} = require("./config/index")
 const {checkConnectionQuery} = require("./query_builder/queries")
-const fs = require("fs")
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
