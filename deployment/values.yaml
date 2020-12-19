@@ -1,4 +1,8 @@
 name: auth
 port: 30000
 deployment:
-  replicas: 5
+  replicas: 2
+  env:
+    - CREATE_CLIENT_QUEUE=CREATE_CLIENT_QUEUE
+    - CREATE_EMPLOYEE_QUEUE=CREATE_EMPLOYEE_QUEUE
+    - CREATE_AUTHOR_QUEUE=CREATE_AUTHOR_QUEUE

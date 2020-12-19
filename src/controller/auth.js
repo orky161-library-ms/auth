@@ -1,59 +1,74 @@
-const jwt = require ('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const crypto = require("crypto")
-const authDal = new (require('../dal/auth'))()
+const {addAuth, getAuthByEmail} = require('../dal/auth')
+const {producerClient, producerEmployee, producerAuthor,} = require("../queues/rabbit/publish")
 
 const Roles = {
     ADMIN: "ADMIN",
-    CLIENT: "CLIENT"
+    CLIENT: "CLIENT",
+    AUTHOR: "AUTHOR"
+}
+async function addAdminAuth({email, password, name}) {
+    const admin = addAuth({email, role: Roles.ADMIN, password: hashPassword(password)})
+    producerEmployee(name)
+    return admin
 }
 
-class authLogic{
-    addAdminAuth({email, password, employeeId}) {
-        return authDal.addAuth({email, role: Roles.ADMIN, employeeId, password: this.hashPassword(password)})
-    }
-    addClientAuth({email, password, clientId}) {
-        return authDal.addAuth({email, role: Roles.CLIENT, clientId, password: this.hashPassword(password)})
-    }
+async function addClientAuth({email, password, name}) {
+    const client = addAuth({email, role: Roles.CLIENT, password: hashPassword(password)})
+    producerClient(name)
+    return client
+}
 
-    async checkAuth({email, password }) {
-        try {
-            const auth = await authDal.getAuthByEmail(email)
-            if (auth.password === this.hashPassword(password)) {
-                return this.generateToken(auth)
+async function addAuthorAuth({email, password, name}) {
+    const author = addAuth({email, role: Roles.AUTHOR, password: hashPassword(password)})
+    producerAuthor(name)
+    return author
+}
+
+async function checkAuth({email, password}) {
+    try {
+        const auth = await getAuthByEmail(email)
+        if (auth.password === hashPassword(password)) {
+            return generateToken(auth)
+        }
+        throw Error()
+    } catch (e) {
+        return "email and password do not match"
+    }
+}
+
+function verifyToken(t) {
+    return new Promise((resolve, reject) => {
+        if (!/^Barrer /.test(t))
+            return reject("Should Barrer the token")
+        const token = t.replace('Barrer ', '');
+        jwt.verify(token, process.env.TOKEN_PRIVATE_KEY, (err, decoded) => {
+            if (err) {
+                reject(Error);
             }
-            throw Error()
-        }
-        catch (e){
-            return "email and password do not match"
-        }
-    }
-    verifyToken(t) {
-        return  new Promise((resolve, reject) => {
-            if (!/^Barrer /.test(t))
-                return reject("Should Barrer the token")
-            const token = t.replace('Barrer ', '');
-            jwt.verify(token, process.env.TOKEN_PRIVATE_KEY, (err, decoded) => {
-                if (err) {
-                    reject(Error);
-                }
-                resolve(decoded)
-            })
-
+            resolve(decoded)
         })
-    }
 
-    generateToken ({id, email, role}) {
-        return new Promise((resolve) => {
-            jwt.sign({ id, email, role }, process.env.TOKEN_PRIVATE_KEY, { algorithm: 'HS256' },
-                 (err, token) => {
+    })
+}
+
+function generateToken({id, email, role}) {
+    return new Promise((resolve) => {
+        jwt.sign({id, email, role}, process.env.TOKEN_PRIVATE_KEY, {algorithm: 'HS256'},
+            (err, token) => {
                 resolve(token);
             });
-        });
-    };
+    });
+};
 
-    hashPassword (pass){
-        return crypto.createHash('sha256').update(pass).digest('hex');
-    }
+function hashPassword(pass) {
+    return crypto.createHash('sha256').update(pass).digest('hex');
 }
 
-module.exports = authLogic
+module.exports = {
+    addAdminAuth,
+    addClientAuth,
+    checkAuth,
+    verifyToken,
+}
