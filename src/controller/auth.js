@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const crypto = require("crypto")
-const {addAuth, getAuthByEmail} = require('../dal/auth')
+const AuthDal = require('../dal/auth')
 const {producerClient, producerEmployee, producerAuthor,} = require("../queues/rabbit/publish")
 
 const Roles = {
@@ -9,26 +9,26 @@ const Roles = {
     AUTHOR: "AUTHOR"
 }
 async function addAdminAuth({email, password, name}) {
-    const admin = addAuth({email, role: Roles.ADMIN, password: hashPassword(password)})
+    const admin = await AuthDal.addAuth({email, role: Roles.ADMIN, password: hashPassword(password)})
     producerEmployee(name)
     return admin
 }
 
 async function addClientAuth({email, password, name}) {
-    const client = addAuth({email, role: Roles.CLIENT, password: hashPassword(password)})
-    producerClient(name)
+    const client = await AuthDal.addAuth({email, role: Roles.CLIENT, password: hashPassword(password)})
+    producerClient({email, name, client})
     return client
 }
 
 async function addAuthorAuth({email, password, name}) {
-    const author = addAuth({email, role: Roles.AUTHOR, password: hashPassword(password)})
+    const author = await AuthDal.addAuth({email, role: Roles.AUTHOR, password: hashPassword(password)})
     producerAuthor(name)
     return author
 }
 
 async function checkAuth({email, password}) {
     try {
-        const auth = await getAuthByEmail(email)
+        const auth = await AuthDal.getAuthByEmail(email)
         if (auth.password === hashPassword(password)) {
             return generateToken(auth)
         }
@@ -71,4 +71,5 @@ module.exports = {
     addClientAuth,
     checkAuth,
     verifyToken,
+    addAuthorAuth
 }

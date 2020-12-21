@@ -1,9 +1,9 @@
 const mysql = require('mysql2');
 const amqp = require('amqplib/callback_api');
-const {channelConsume} = require("../queues/rabbit/auth");
+const {startPublisher} = require("../queues/rabbit/index");
 
 function createRabbitConnection (){
-    amqp.connect(`amqps://Admin1234Admin1234:Admin1234Admin1234@b-087fc639-ddfe-476b-a59e-b646b232d665.mq.us-east-1.amazonaws.com:5671`, async (err, conn) => {
+    amqp.connect(process.env.RABBIT_URL+ "?heartbeat=60", async (err, conn) => {
         if (err) {
             console.error("[AMQP]", err.message);
             return setTimeout(createRabbitConnection, 1500 + (Math.random() * 3000));
@@ -18,7 +18,7 @@ function createRabbitConnection (){
             return setTimeout(createRabbitConnection, 1500 + (Math.random() * 3000));
         });
         console.log("[AMQP] connected");
-        await channelConsume(conn)
+        await startPublisher(conn)
     });
 }
 
@@ -35,11 +35,8 @@ const pool = mysql.createPool({
     multipleStatements: true
 });
 
-// const pool = mysql.createPool({
-//     uri:"mysql://my_user:some_password_123@mysql:3306/the_database"
-// });
-
 const promisePool = pool.promise();
+
 module.exports = {
     pool: promisePool,
     createRabbitConnection
