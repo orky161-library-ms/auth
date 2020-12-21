@@ -22,7 +22,7 @@ async function addClientAuth({email, password, name}) {
 
 async function addAuthorAuth({email, password, name}) {
     const author = await AuthDal.addAuth({email, role: Roles.AUTHOR, password: hashPassword(password)})
-    producerAuthor(name)
+    producerAuthor({email, author, name})
     return author
 }
 
