@@ -8,10 +8,12 @@ router.post("/admin",(async (req, res) => {
     const employee = await addAdminAuth(req.body)
     res.status(200).json({employee})
 }))
+
 router.post("/client",(async (req, res) => {
     const client = await addClientAuth(req.body)
     res.status(200).json({client})
 }))
+
 router.post("/author",(async (req, res) => {
     const client = await addAuthorAuth(req.body)
     res.status(200).json({client})
@@ -21,6 +23,7 @@ router.post("/login",(async (req, res) => {
     const token = await checkAuth(req.body)
     res.status(200).json({token})
 }))
+
 router.get("/verify",(async (req, res) => {
         const decoded = await verifyToken(req.headers['x-access-token'])
         res.status(200).json({decoded})

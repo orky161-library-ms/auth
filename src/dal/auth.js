@@ -3,7 +3,7 @@ const {getAuthByEmailQuery, addAuthQuery, checkConnectionQuery} = require("../qu
 
 
 async function addAuth({email, password, role, employeeId, clientId}) {
-    const auth = await pool.query(addAuthQuery, [email, password, role, employeeId, clientId])
+    const auth = await pool.query(addAuthQuery, [email, password, role])
     return auth[0].insertId
 }
 
