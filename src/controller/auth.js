@@ -9,9 +9,9 @@ const Roles = {
     AUTHOR: "AUTHOR"
 }
 async function addAdminAuth({email, password, name}) {
-    const admin = await AuthDal.addAuth({email, role: Roles.ADMIN, password: hashPassword(password)})
-    producerEmployee(name)
-    return admin
+    const employee = await AuthDal.addAuth({email, role: Roles.ADMIN, password: hashPassword(password)})
+    producerEmployee({name, employee, email})
+    return employee
 }
 
 async function addClientAuth({email, password, name}) {
