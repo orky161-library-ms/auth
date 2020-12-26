@@ -1,0 +1,20 @@
+name: auth
+port: 30000
+deployment:
+  replicas: 2
+  env:
+    CREATE_CLIENT_QUEUE: "CREATE_CLIENT_QUEUE"
+    CREATE_EMPLOYEE_QUEUE: "CREATE_EMPLOYEE_QUEUE"
+    CREATE_AUTHOR_QUEUE: "CREATE_AUTHOR_QUEUE"
+authService: auth-service
+public:
+  - path: "/ping"
+    method: "GET"
+  - path: "/health"
+    method: "GET"
+  - path: "/api/auth/client"
+    method: "POST"
+  - path: "/api/auth/login"
+    method: "POST"
+
+
