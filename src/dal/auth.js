@@ -1,5 +1,5 @@
 const {pool} = require('../config/index')
-const {getAuthByEmailQuery, addAuthQuery, checkConnectionQuery} = require("../query_builder/queries")
+const {getAuthByEmailQuery, addAuthQuery, checkConnectionQuery} = require("./query_builder/queries")
 
 
 async function addAuth({email, password, role, employeeId, clientId}) {
