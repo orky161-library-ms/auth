@@ -10,11 +10,22 @@ authService: auth-service
 public:
   - path: "/ping"
     method: "GET"
+    id: "GET_PING"
+
   - path: "/health"
     method: "GET"
+    id: "GET_HEALTH"
+
   - path: "/api/auth/client"
     method: "POST"
+    id: "ADD_CLIENT"
+
   - path: "/api/auth/login"
     method: "POST"
+    id: "LOGIN"
 
+  - path: "/pingo/[a-z]*[^/]+$"
+    method: "POST"
+    id: "PostGia"
+    prefix: "~ ^"
 
