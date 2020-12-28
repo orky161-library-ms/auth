@@ -1,6 +1,7 @@
 const mysql = require('mysql2');
 const amqp = require('amqplib/callback_api');
 const {startPublisher} = require("../queues/rabbit/index");
+const LibraryAuth = require("library.io-libs/dist/authorization")
 
 function createRabbitConnection (){
     amqp.connect(process.env.RABBIT_URL+ "?heartbeat=60", async (err, conn) => {
@@ -37,7 +38,10 @@ const pool = mysql.createPool({
 
 const promisePool = pool.promise();
 
+const libraryAuth = new LibraryAuth(process.env.TOKEN_PRIVATE_KEY)
+
 module.exports = {
     pool: promisePool,
-    createRabbitConnection
+    createRabbitConnection,
+    libraryAuth
 }
