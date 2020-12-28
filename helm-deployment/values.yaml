@@ -23,9 +23,3 @@ public:
   - path: "/api/auth/login"
     method: "POST"
     id: "LOGIN"
-
-  - path: "/pingo/[a-z]*[^/]+$"
-    method: "POST"
-    id: "PostGia"
-    prefix: "~ ^"
-
